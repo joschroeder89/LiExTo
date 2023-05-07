@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QPixmap, QFont
+from file_handler import FileHandler
 import os
 import sys
 
@@ -162,14 +163,16 @@ class UploadWindow(MainWindow):
         
     def livery_files_reset(self):
         self.upload_livery_files.setStyleSheet("QPushButton{background-color: rgb(159, 47, 223);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}")
-
+        self.livery_files = FileHandler(self.widget, "liveries")
+        
     def livery_json_clicked(self):
         self.upload_livery_json.setStyleSheet("QPushButton{background-color: rgb(177, 105, 219);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}")
         self.upload_livery_json.released.connect(self.livery_json_reset)
         
     def livery_json_reset(self):
         self.upload_livery_json.setStyleSheet("QPushButton{background-color: rgb(159, 47, 223);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}")
-
+        self.car_file = FileHandler(self.widget, "cars")
+        
     def go_back(self):
         self.back_button.setStyleSheet("QPushButton{background-color: rgb(177, 105, 219);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}")
         self.back_button.released.connect(self.back_button_reset)
@@ -205,7 +208,7 @@ class ServerConfig(MainWindow):
         self.banner.setStyleSheet("QPushButton{background-color: rgb(159, 47, 223);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}")
         
         # save config button
-        self.save_config_button = QPushButton("Upload", self.widget)
+        self.save_config_button = QPushButton("Save", self.widget)
         self.save_config_button.setFont(self.font_big)
         self.save_config_button.setStyleSheet("QPushButton{background-color: rgb(159, 47, 223);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}")
         self.save_config_button.move(1000, 750)
