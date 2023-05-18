@@ -53,10 +53,21 @@ class MainWindow:
         self.upload_button.setStyleSheet(
             "QPushButton{background-color: rgb(197, 25, 102);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
         )
-        self.upload_button.move(250, 750)
+        self.upload_button.move(200, 750)
         self.upload_button.resize(250, 75)
         self.upload_button.pressed.connect(self.upload_clicked)
 
+        # download button
+        self.download_button = QPushButton("Download", self.widget)
+        self.download_button.setFont(self.font_big)
+        self.download_button.setToolTip("Download a livery pack.")
+        self.download_button.setStyleSheet(
+            "QPushButton{background-color: rgb(197, 25, 102);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
+        )
+        self.download_button.move(550, 750)
+        self.download_button.resize(300, 75)
+        self.download_button.pressed.connect(self.download_clicked)
+        
         # config button
         self.server_button = QPushButton("Config", self.widget)
         self.server_button.setFont(self.font_big)
@@ -64,12 +75,26 @@ class MainWindow:
         self.server_button.setStyleSheet(
             "QPushButton{background-color: rgb(197, 25, 102);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
         )
-        self.server_button.move(900, 750)
+        self.server_button.move(950, 750)
         self.server_button.resize(250, 75)
         self.server_button.pressed.connect(self.server_conf)
 
         self.widget.show()
 
+    def download_clicked(self):
+        self.download_button.setStyleSheet(
+            "QPushButton{background-color: rgb(218, 65, 133);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
+        )
+        self.download_button.released.connect(self.download_clicked_color_reset)
+    
+    def download_clicked_color_reset(self):
+        self.download_button.setStyleSheet(
+            "QPushButton{background-color: rgb(197, 25, 102);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
+        )
+        self.download_handler = DownloadWindow()
+        self.widget.close()
+        self.download_button.released.disconnect(self.download_clicked_color_reset)
+    
     def server_button_color_reset(self):
         self.server_button.setStyleSheet(
             "QPushButton{background-color: rgb(197, 25, 102);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
@@ -278,6 +303,78 @@ class UploadWindow(MainWindow):
         self.msg.exec_()
         
 
+class DownloadWindow(MainWindow):
+    def __init__(self):
+        super().__init__()
+        self.widget = QWidget()
+        self.label = QLabel(self.widget)
+        
+        # image and icon paths
+        self.bg_img = QPixmap("./images/download.png")
+        
+        # set background image and stylesheet
+        self.label.setPixmap(self.bg_img)
+        self.widget.setGeometry(self.x_pos, self.y_pos, self.width, self.height)
+        self.widget.setStyleSheet("QWidget{border: 2px solid rgb(47, 196, 223);}")
+        self.widget.setWindowTitle("Livery Exchange Tool")
+        self.widget.setWindowIcon(self.icon)
+        self.widget.setFixedSize(self.width, self.height)
+        self.widget.resize(self.width, self.height)
+                # banner
+        self.banner = QPushButton("Download Liveries", self.widget)
+        self.banner.setFont(self.font_big)
+        self.banner.move(400, 75)
+        self.banner.resize(600, 75)
+        self.banner.setStyleSheet(
+            "QPushButton{background-color: rgb(159, 47, 223);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
+        )
+
+        # save config button
+        self.download_button = QPushButton("Download", self.widget)
+        self.download_button.setFont(self.font_big)
+        self.download_button.setStyleSheet(
+            "QPushButton{background-color: rgb(159, 47, 223);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
+        )
+        self.download_button.move(900, 750)
+        self.download_button.resize(300, 75)
+        self.download_button.pressed.connect(self.download_clicked)
+
+        # back button
+        self.back_button = QPushButton("Back", self.widget)
+        self.back_button.setFont(self.font_big)
+        self.back_button.setStyleSheet(
+            "QPushButton{background-color: rgb(159, 47, 223);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
+        )
+        self.back_button.move(150, 750)
+        self.back_button.resize(250, 75)
+        self.back_button.pressed.connect(self.go_back)
+
+        self.widget.show()
+
+    def download_clicked(self):
+        self.download_button.setStyleSheet(
+            "QPushButton{background-color: rgb(177, 105, 219);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
+        )
+        self.download_button.released.connect(self.download_button_reset)
+
+    def download_button_reset(self):
+        self.download_button.setStyleSheet(
+            "QPushButton{background-color: rgb(159, 47, 223);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
+        )
+
+    def go_back(self):
+        self.back_button.setStyleSheet(
+            "QPushButton{background-color: rgb(177, 105, 219);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
+        )
+        self.back_button.released.connect(self.back_button_reset)
+        
+    def back_button_reset(self):
+        self.back_button.setStyleSheet(
+            "QPushButton{background-color: rgb(159, 47, 223);color: rgb(47, 196, 223);border: 2px solid rgb(47, 196, 223);}"
+        )
+        self.main = MainWindow()
+        self.widget.close()
+        
 class ServerConfig(MainWindow):
     def __init__(self):
         super().__init__()
