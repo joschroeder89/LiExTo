@@ -85,6 +85,7 @@ class FileHandler():
             self.msg.setText("Missing .dds files!")
             self.msg.resize(500, 500)
             self.msg.exec_()
+            return []
             # FileHandler(self.widget, "liveries")
         else:
             return self.files
