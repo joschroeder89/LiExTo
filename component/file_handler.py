@@ -3,8 +3,13 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QMainWindow
 )
+from dataclasses import dataclass
 import json
 import os
+
+@dataclass
+class FilesStorage():
+    pass
 
 class FileHandler():
     def __init__(self, widget: QMainWindow, file_type: str) -> None:
@@ -32,7 +37,6 @@ class FileHandler():
             r"Customs\Cars")
 
         if file_type == "liveries":
-            print(file_type)
             self.files, _ = self.file_handler.getOpenFileNames(
                 parent=widget,
                 caption="Upload livery files",
@@ -42,7 +46,6 @@ class FileHandler():
             self.files = [file for file in self.files if file.endswith(tuple(self.file_ext))]
 
         if file_type == "cars":
-            print(file_type)
             self.file, _ = self.file_handler.getOpenFileName(
                 parent=widget,
                 caption="Upload car json file",
@@ -51,14 +54,14 @@ class FileHandler():
             )
             # self.check_file(self.file)
 
-    def check_file(self, files):
-        print(files, self.file)
+    def check_car_file(self, files):
         if not self.file.endswith('json') and len(self.file):
             self.msg.setWindowTitle("Wrong file type!")
             self.msg.setIcon(QMessageBox.Critical)
             self.msg.setText("Not a .json file!")
             self.msg.resize(200, 200)
             self.msg.exec_()
+            return False
 
         if self.file != "":
             with open(self.file, 'r') as f:
@@ -66,19 +69,18 @@ class FileHandler():
             json_data = json.loads(data.encode("utf-8"))
             skin_name = json_data["customSkinName"]
             folder = files[0].split('/')[-2]
+
             if folder != skin_name:
                 self.msg.setWindowTitle("Car.json mismatch!")
                 self.msg.setIcon(QMessageBox.Critical)
                 self.msg.setText("Car.json file does not match livery folder!")
                 self.msg.resize(200, 200)
                 self.msg.exec_()
-            print(self.file)
             return self.file
 
-    def check_files(self):
+    def check_livery_files(self):
         png_cnt, dds_cnt = 0, 0
         for file in self.files:
-            print(file)
             if file.endswith(".png"):
                 png_cnt += 1
             if file.endswith(".dds"):
