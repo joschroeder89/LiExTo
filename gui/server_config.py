@@ -12,14 +12,14 @@ from PyQt5.QtGui import (
     QPalette,
     QBrush
 )
-from component.dropbox_config import DropboxConfig
+from component.dropbox_handler import DropboxHandler
 import gui.main_window
 
 class ServerConfig(QMainWindow):
     def __init__(self):
         super().__init__()
         self.label = QLabel(self)
-        self.drpbx_api_token = ""
+        self.api_token = ""
 
         self.width = 1348
         self.height = 900
@@ -36,11 +36,17 @@ class ServerConfig(QMainWindow):
         self.font_big = QFont("Roboto Mono", 26)
         self.font_small = QFont("Roboto Mono", 16)
         self.font_tiny = QFont("Roboto Mono", 10)
+        self.font_banner = QFont("Roboto Mono", 40)
 
         # style sheets
+        self.style_sheet_banner = "QPushButton{background-color: rgba(159, 47, 223,0);\
+                                        color: rgb(47, 196, 223);}"
         self.style_sheet = "QPushButton{background-color: rgb(159, 47, 223);\
-                                        color: rgb(47, 196, 223);\
-                                        border: 2px solid rgb(47, 196, 223);}"
+                                             color: rgb(47, 196, 223);\
+                                             border: 2px solid rgb(47, 196, 223);}"
+        self.style_sheet_line = "QLineEdit{background-color: rgb(159, 47, 223);\
+                                      color: rgb(47, 196, 223);\
+                                      border: 2px solid rgb(47, 196, 223);}"
         self.style_sheet_bright = "QPushButton{background-color: rgb(177, 105, 219);\
                                                color: rgb(47, 196, 223);\
                                                border: 2px solid rgb(47, 196, 223);}"
@@ -58,26 +64,58 @@ class ServerConfig(QMainWindow):
 
         # banner
         self.banner = QPushButton("Server Config", self)
-        self.banner.setFont(self.font_big)
+        self.banner.setFont(self.font_banner)
         self.banner.move(400, 75)
         self.banner.resize(600, 75)
-        self.banner.setStyleSheet(self.style_sheet)
+        self.banner.setStyleSheet(self.style_sheet_banner)
 
         # text input for dropbox link
         self.server_textbox = QLineEdit(self)
         self.server_textbox.move(50, 225)
-        self.server_textbox.resize(525, 50)
+        self.server_textbox.resize(530, 50)
         self.server_textbox.setFont(self.font_small)
-        self.server_textbox.setStyleSheet(self.style_sheet)
+        self.server_textbox.setStyleSheet(self.style_sheet_line)
         self.server_textbox.setPlaceholderText("Enter Dropbox API Token here...")
 
+        # sharefolder init
+        self.sharefolder_textbox = QLineEdit(self)
+        self.sharefolder_textbox.move(50, 285)
+        self.sharefolder_textbox.resize(530, 50)
+        self.sharefolder_textbox.setFont(self.font_small)
+        self.sharefolder_textbox.setStyleSheet(self.style_sheet_line)
+        self.sharefolder_textbox.setPlaceholderText("Enter Share Folder Name here...")
+
+        # sharelink output box
+        self.sharelink_textbox = QLineEdit(self)
+        self.sharelink_textbox.move(50, 345)
+        self.sharelink_textbox.resize(530, 50)
+        self.sharelink_textbox.setFont(self.font_small)
+        self.sharelink_textbox.setStyleSheet(self.style_sheet_line)
+        self.sharelink_textbox.setPlaceholderText("Dropbox Share Link will appear here...")
+
         # save dropbox link
-        self.save_drpbx_link_button = QPushButton("Save", self)
-        self.save_drpbx_link_button.setFont(self.font_tiny)
-        self.save_drpbx_link_button.setStyleSheet(self.style_sheet)
-        self.save_drpbx_link_button.move(600, 225)
-        self.save_drpbx_link_button.resize(100, 50)
-        self.save_drpbx_link_button.pressed.connect(self.dropbox_link_button_pressed)
+        self.set_api_token_button = QPushButton("Check Api Token", self)
+        self.set_api_token_button.setFont(self.font_small)
+        self.set_api_token_button.setStyleSheet(self.style_sheet)
+        self.set_api_token_button.move(600, 225)
+        self.set_api_token_button.resize(275, 50)
+        self.set_api_token_button.pressed.connect(self.set_dropbox_api_token)
+
+        # save dropbox link
+        self.save_dropbox_link_button = QPushButton("Generate Share Link", self)
+        self.save_dropbox_link_button.setFont(self.font_small)
+        self.save_dropbox_link_button.setStyleSheet(self.style_sheet)
+        self.save_dropbox_link_button.move(600, 345)
+        self.save_dropbox_link_button.resize(275, 50)
+        self.save_dropbox_link_button.pressed.connect(self.dropbox_link_button_pressed)
+
+        # create share folder
+        self.create_sharefolder_button = QPushButton("Create Share Folder", self)
+        self.create_sharefolder_button.setFont(self.font_small)
+        self.create_sharefolder_button.setStyleSheet(self.style_sheet)
+        self.create_sharefolder_button.move(600, 285)
+        self.create_sharefolder_button.resize(275, 50)
+        self.create_sharefolder_button.pressed.connect(self.create_sharefolder)
 
         # save config button
         self.save_config_button = QPushButton("Save", self)
@@ -95,15 +133,26 @@ class ServerConfig(QMainWindow):
         self.back_button.resize(250, 75)
         self.back_button.pressed.connect(self.go_back)
 
+    def set_dropbox_api_token(self):
+        self.set_api_token_button.setStyleSheet(self.style_sheet_bright)
+        self.set_api_token_button.released.connect(self.set_dropbox_api_token_clicked)
+        if self.server_textbox.text():
+            self.api_token = self.server_textbox.text()
+            self.dropbox_handler = DropboxHandler(self.api_token)
+
+    def set_dropbox_api_token_clicked(self):
+        self.set_api_token_button.setStyleSheet(self.style_sheet)
+        self.set_api_token_button.released.disconnect(self.set_dropbox_api_token_clicked)
+
     def dropbox_link_button_pressed(self):
         self.save_dropbox_link_button.setStyleSheet(self.style_sheet_bright)
         self.save_dropbox_link_button.released.connect(self.dropbox_link_button_released)
-        api_token = self.server_textbox.text()
-        self.dropbox_handler = DropboxConfig(api_token)
 
     def dropbox_link_button_released(self):
         self.save_dropbox_link_button.setStyleSheet(self.style_sheet)
-        self.save_dropbx_link_button.released.disconnect(self.dropbox_link_button_released)
+        self.sharelink = self.dropbox_handler.get_sharelink(self.sharefolder_textbox.text())
+        self.sharelink_textbox.setText(self.sharelink.url)
+        self.save_dropbox_link_button.released.disconnect(self.dropbox_link_button_released)
 
     def save_config_clicked(self):
         self.save_config_button.setStyleSheet(self.style_sheet_bright)
@@ -111,6 +160,15 @@ class ServerConfig(QMainWindow):
 
     def save_config_button_reset(self):
         self.save_config_button.setStyleSheet(self.style_sheet)
+
+    def create_sharefolder(self):
+        self.create_sharefolder_button.setStyleSheet(self.style_sheet_bright)
+        self.create_sharefolder_button.released.connect(self.create_sharefolder_clicked)
+
+    def create_sharefolder_clicked(self):
+        self.create_sharefolder_button.setStyleSheet(self.style_sheet)
+        self.dropbox_handler.init_sharefolder(self.sharefolder_textbox.text())
+        self.create_sharefolder_button.released.disconnect(self.create_sharefolder_clicked)
 
     def go_back(self):
         self.back_button.setStyleSheet(self.style_sheet_bright)

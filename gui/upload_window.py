@@ -5,10 +5,10 @@ from PyQt5.QtWidgets import (
     QListWidget,
     QLineEdit,
     QMessageBox,
-    QApplication
+    QApplication,
+    QTreeWidget
 )
 from PyQt5.QtGui import (
-    QPixmap,
     QIcon,
     QFont,
     QBrush,
@@ -19,14 +19,16 @@ from component.file_handler import FileHandler
 import gui.main_window
 
 class UploadWindow(QMainWindow):
-    def __init__(self, livery_files):
+    def __init__(self, livery_files: list, car_file: str):
         super().__init__()
         self.label = QLabel(self)
         self.list = QListWidget(self)
 
         # variables
         self.livery_files = livery_files
+        self.car_file = car_file
         print(self.livery_files)
+        print(self.car_file)
 
         self.width = 1348
         self.height = 900
@@ -51,7 +53,7 @@ class UploadWindow(QMainWindow):
 
         # style sheets
         self.style_sheet_banner = "QPushButton{background-color: rgba(197, 25, 102, 0);\
-                                               color: rgb(159, 47, 223);}"
+                                               color: rgb(255, 124, 1);}"
         self.style_sheet = "QPushButton{background-color: rgb(159, 47, 223);\
                                         color: rgb(47, 196, 223);\
                                         border: 2px solid rgb(47, 196, 223);}"
@@ -79,12 +81,23 @@ class UploadWindow(QMainWindow):
         # list widget
         self.list.setStyleSheet(self.style_sheet_list)
         self.list.setFont(self.font_tiny)
-        self.list.resize(500, 200)
-        self.list.move(750, 225)
-        item_list = [item.split('/')[-1] for item in self.livery_files]
-        folder_list = [folder.split('/')[-2] for folder in self.livery_files]
-        items = [f"{folder}/{item}" for item, folder in zip(item_list, folder_list)]
-        self.list.addItems(items)
+        self.list.resize(825, 250)
+        self.list.move(425, 225)
+        if self.livery_files:
+            # item_list = [item.split('/')[-1] for item in self.livery_files]
+            # folder_list = [folder.split('/')[-2] for folder in self.livery_files]
+            # name_list = [name.split('/')[-3] for name in self.livery_files]
+            # items = [f"{name}/{folder}/{item}" for item, name, folder in zip(item_list, name_list, folder_list)]
+            self.list.addItems(self.livery_files)
+
+        # clear items
+        self.clear_items_button = QPushButton("Clear Items", self)
+        self.clear_items_button.setFont(self.font_small)
+        self.clear_items_button.setToolTip("Clear all items.")
+        self.clear_items_button.setStyleSheet(self.style_sheet)
+        self.clear_items_button.resize(350, 50)
+        self.clear_items_button.move(50, 335)
+        self.clear_items_button.pressed.connect(self.clear_files)
 
         # livery upload button
         self.banner = QPushButton("Livery Upload", self)
@@ -98,7 +111,7 @@ class UploadWindow(QMainWindow):
         self.upload_livery_files.setFont(self.font_small)
         self.upload_livery_files.setToolTip("Upload your livery files.")
         self.upload_livery_files.setStyleSheet(self.style_sheet)
-        self.upload_livery_files.move(50, 300)
+        self.upload_livery_files.move(50, 225)
         self.upload_livery_files.resize(350, 50)
         self.upload_livery_files.pressed.connect(self.livery_files_clicked)
 
@@ -107,14 +120,14 @@ class UploadWindow(QMainWindow):
         self.upload_livery_json.setFont(self.font_small)
         self.upload_livery_json.setToolTip("Upload your livery files.")
         self.upload_livery_json.setStyleSheet(self.style_sheet)
-        self.upload_livery_json.move(50, 375)
+        self.upload_livery_json.move(50, 280)
         self.upload_livery_json.resize(350, 50)
         self.upload_livery_json.pressed.connect(self.livery_json_clicked)
 
         # text input for server adress
         self.server_textbox = QLineEdit(self)
-        self.server_textbox.move(50, 225)
-        self.server_textbox.resize(525, 50)
+        self.server_textbox.move(425, 480)
+        self.server_textbox.resize(825, 50)
         self.server_textbox.setFont(self.font_small)
         self.server_textbox.setStyleSheet(self.style_sheet_line)
         self.server_textbox.setPlaceholderText("Enter Dropbox Share Link here...")
@@ -131,14 +144,9 @@ class UploadWindow(QMainWindow):
         self.back_button = QPushButton("Back", self)
         self.back_button.setFont(self.font_big)
         self.back_button.setStyleSheet(self.style_sheet)
-        self.back_button.move(150, 750)
+        self.back_button.move(125, 750)
         self.back_button.resize(250, 75)
         self.back_button.pressed.connect(self.go_back)
-
-    def update_livery_files(self, livery_files):
-        if livery_files:
-            self.livery_files = livery_files
-        return self.livery_files
 
     def start_upload(self):
         self.upload_button.setStyleSheet(self.style_sheet_bright)
@@ -158,20 +166,23 @@ class UploadWindow(QMainWindow):
         self.upload_livery_files.released.disconnect(self.livery_files_reset)
 
     def upload_handler_liveries(self):
-        self.livery_files_handler = FileHandler(self, "liveries")
-        self.livery_files = self.livery_files_handler.check_livery_files()
-        if not self.livery_files or self.livery_files is None:
+        self.file_handler = FileHandler(self, self.livery_files, self.car_file)
+        self.livery_files = self.file_handler.add_livery_files()
+        if not self.livery_files:
             return
-        if len(self.livery_files):
-            self.LIVERY_STATUS_OK = True
-            item_list = [item.split('/')[-1] for item in self.livery_files]
-            folder_list = [folder.split('/')[-2] for folder in self.livery_files]
-            items = [f"{folder}/{item}" for item, folder in zip(item_list, folder_list)]
-            for item in items:
-                if item not in self.livery_files:
-                    self.list.addItem(item)
-                    # self.livery_files.append(item)
-        return
+        if self.livery_files:
+            # item_list = [item.split('/')[-1] for item in self.livery_files]
+            # folder_list = [folder.split('/')[-2] for folder in self.livery_files]
+            # name_list = [name.split('/')[-3] for name in self.livery_files]
+            # items = [f"{name}/{folder}/{item}" for item, name, folder in zip(item_list, name_list, folder_list)]
+            self.livery_files = list(set(self.livery_files))
+            self.list.addItems(self.livery_files)
+            self.livery_files = [self.list.item(x).text() for x in range(self.list.count())]
+            # self.livery_files = list(set(self.livery_files))
+            # for item in items:
+            #     if item not in self.livery_files:
+            #         self.livery_files.append(item)
+        # return
 
     def livery_json_clicked(self):
         self.upload_livery_json.setStyleSheet(self.style_sheet_bright)
@@ -210,7 +221,13 @@ class UploadWindow(QMainWindow):
         self.close()
 
     def clear_files(self):
-        pass
+        self.clear_items_button.setStyleSheet(self.style_sheet_bright)
+        self.clear_items_button.released.connect(self.clear_files_clicked)
+
+    def clear_files_clicked(self):
+        self.clear_items_button.setStyleSheet(self.style_sheet)
+        self.list.clear()
+        self.livery_files = []
 
     def error_livery_first(self):
         self.msg = QMessageBox()

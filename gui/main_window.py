@@ -17,13 +17,15 @@ import gui.server_config
 import gui.upload_window
 
 class MainWindow(QMainWindow):
-    def __init__(self, livery_files=[]):
+    def __init__(self, livery_files=[], car_file=""):
         super().__init__()
         self.label = QLabel(self)
 
         # variables
         self.livery_files = livery_files
+        self.car_file = car_file
         print(self.livery_files)
+        print(self.car_file)
 
         self.width = 1348
         self.height = 900
@@ -130,6 +132,6 @@ class MainWindow(QMainWindow):
     def upload_button_color_reset(self):
         self.upload_button.setStyleSheet(self.style_sheet)
         self.upload_button.released.disconnect(self.upload_button_color_reset)
-        self.upload = gui.upload_window.UploadWindow(self.livery_files)
+        self.upload = gui.upload_window.UploadWindow(self.livery_files, self.car_file)
         self.upload.show()
         self.close()
