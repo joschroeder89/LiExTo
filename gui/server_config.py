@@ -13,13 +13,23 @@ from PyQt5.QtGui import (
     QBrush
 )
 from component.dropbox_handler import DropboxHandler
+import configparser
 import gui.main_window
+import os
 
 class ServerConfig(QMainWindow):
     def __init__(self):
         super().__init__()
         self.label = QLabel(self)
         self.api_token = ""
+
+        # folder and config parser
+        self.toplevel_folder = os.getcwd()
+        self.dropbox_config = configparser.ConfigParser()
+        if os.path.exists(os.path.join(self.toplevel_folder, "dropbox.ini")):
+            self.dropbox_config.read(os.path.join(self.toplevel_folder, "dropbox.ini"))
+            self.api_token = self.dropbox_config["DROPBOX"]["TOKEN"]
+            self.dropbox_handler = DropboxHandler(self.api_token)
 
         self.width = 1348
         self.height = 900
@@ -44,9 +54,15 @@ class ServerConfig(QMainWindow):
         self.style_sheet = "QPushButton{background-color: rgb(159, 47, 223);\
                                              color: rgb(47, 196, 223);\
                                              border: 2px solid rgb(47, 196, 223);}"
+        self.style_sheet_green = "QPushButton{background-color: rgb(0, 255, 157);\
+                                              color: rgb(47, 196, 223);\
+                                              border: 2px solid rgb(47, 196, 223);}"
         self.style_sheet_line = "QLineEdit{background-color: rgb(159, 47, 223);\
                                       color: rgb(47, 196, 223);\
                                       border: 2px solid rgb(47, 196, 223);}"
+        self.style_sheet_line_green = "QLineEdit{background-color: rgb(0, 255, 157);\
+                                                 color: rgb(47, 196, 223);\
+                                                 border: 2px solid rgb(47, 196, 223);}"
         self.style_sheet_bright = "QPushButton{background-color: rgb(177, 105, 219);\
                                                color: rgb(47, 196, 223);\
                                                border: 2px solid rgb(47, 196, 223);}"
@@ -74,8 +90,12 @@ class ServerConfig(QMainWindow):
         self.server_textbox.move(50, 225)
         self.server_textbox.resize(530, 50)
         self.server_textbox.setFont(self.font_small)
-        self.server_textbox.setStyleSheet(self.style_sheet_line)
+        if self.api_token:
+            self.server_textbox.setStyleSheet(self.style_sheet_line_green)
+        else:
+            self.server_textbox.setStyleSheet(self.style_sheet_line)
         self.server_textbox.setPlaceholderText("Enter Dropbox API Token here...")
+        self.server_textbox.setText(self.api_token)
 
         # sharefolder init
         self.sharefolder_textbox = QLineEdit(self)
@@ -94,12 +114,16 @@ class ServerConfig(QMainWindow):
         self.sharelink_textbox.setPlaceholderText("Dropbox Share Link will appear here...")
 
         # save dropbox link
-        self.set_api_token_button = QPushButton("Check Api Token", self)
+        if self.api_token:
+            self.set_api_token_button = QPushButton("Token is set", self)
+            self.set_api_token_button.setStyleSheet(self.style_sheet_green)
+        else:
+            self.set_api_token_button = QPushButton("Set Api Token", self)
+            self.set_api_token_button.setStyleSheet(self.style_sheet)
+            self.set_api_token_button.pressed.connect(self.set_dropbox_api_token)
         self.set_api_token_button.setFont(self.font_small)
-        self.set_api_token_button.setStyleSheet(self.style_sheet)
         self.set_api_token_button.move(600, 225)
         self.set_api_token_button.resize(275, 50)
-        self.set_api_token_button.pressed.connect(self.set_dropbox_api_token)
 
         # save dropbox link
         self.save_dropbox_link_button = QPushButton("Generate Share Link", self)
@@ -136,9 +160,15 @@ class ServerConfig(QMainWindow):
     def set_dropbox_api_token(self):
         self.set_api_token_button.setStyleSheet(self.style_sheet_bright)
         self.set_api_token_button.released.connect(self.set_dropbox_api_token_clicked)
-        if self.server_textbox.text():
+        if not os.path.exists(os.path.join(self.toplevel_folder, "dropbox.ini")):
+            with open(os.path.join(self.toplevel_folder, "dropbox.ini"), "w") as ini:
+                self.dropbox_config["DROPBOX"] = {}
+                self.dropbox_config["DROPBOX"]["TOKEN"] = self.server_textbox.text()
+                self.dropbox_config.write(ini)
             self.api_token = self.server_textbox.text()
             self.dropbox_handler = DropboxHandler(self.api_token)
+            self.set_api_token_button.setText("Token is set")
+            self.set_api_token_button.setStyleSheet(self.style_sheet_green)
 
     def set_dropbox_api_token_clicked(self):
         self.set_api_token_button.setStyleSheet(self.style_sheet)
