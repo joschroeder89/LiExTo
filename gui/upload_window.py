@@ -27,8 +27,6 @@ class UploadWindow(QMainWindow):
         # variables
         self.livery_files = livery_files
         self.car_file = car_file
-        print(self.livery_files)
-        print(self.car_file)
 
         self.width = 1348
         self.height = 900

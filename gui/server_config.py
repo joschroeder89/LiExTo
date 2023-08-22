@@ -22,13 +22,15 @@ class ServerConfig(QMainWindow):
         super().__init__()
         self.label = QLabel(self)
         self.api_token = ""
-
+        self.share_link = ""
+        
         # folder and config parser
         self.toplevel_folder = os.getcwd()
         self.dropbox_config = configparser.ConfigParser()
         if os.path.exists(os.path.join(self.toplevel_folder, "dropbox.ini")):
             self.dropbox_config.read(os.path.join(self.toplevel_folder, "dropbox.ini"))
             self.api_token = self.dropbox_config["DROPBOX"]["TOKEN"]
+            self.share_link = self.dropbox_config["DROPBOX"]["SHARELINK"]
             self.dropbox_handler = DropboxHandler(self.api_token)
 
         self.width = 1348
@@ -92,10 +94,11 @@ class ServerConfig(QMainWindow):
         self.server_textbox.setFont(self.font_small)
         if self.api_token:
             self.server_textbox.setStyleSheet(self.style_sheet_line_green)
+            self.server_textbox.setPlaceholderText("Token already set...")
         else:
             self.server_textbox.setStyleSheet(self.style_sheet_line)
-        self.server_textbox.setPlaceholderText("Enter Dropbox API Token here...")
-        self.server_textbox.setText(self.api_token)
+            self.server_textbox.setPlaceholderText("Enter Dropbox API Token here...")
+        # self.server_textbox.setText(self.api_token)
 
         # sharefolder init
         self.sharefolder_textbox = QLineEdit(self)
@@ -110,22 +113,24 @@ class ServerConfig(QMainWindow):
         self.sharelink_textbox.move(50, 345)
         self.sharelink_textbox.resize(530, 50)
         self.sharelink_textbox.setFont(self.font_small)
+        if not self.share_link:
+            self.sharelink_textbox.setPlaceholderText("Dropbox Share Link will appear here...")
+        else:
+            self.sharelink_textbox.setText(self.share_link)
         self.sharelink_textbox.setStyleSheet(self.style_sheet_line)
-        self.sharelink_textbox.setPlaceholderText("Dropbox Share Link will appear here...")
 
         # save dropbox link
         if self.api_token:
-            self.set_api_token_button = QPushButton("Token is set", self)
-            self.set_api_token_button.setStyleSheet(self.style_sheet_green)
+            self.set_api_token_button = QPushButton("Set Api Token", self)
         else:
             self.set_api_token_button = QPushButton("Set Api Token", self)
-            self.set_api_token_button.setStyleSheet(self.style_sheet)
             self.set_api_token_button.pressed.connect(self.set_dropbox_api_token)
+        self.set_api_token_button.setStyleSheet(self.style_sheet)
         self.set_api_token_button.setFont(self.font_small)
         self.set_api_token_button.move(600, 225)
         self.set_api_token_button.resize(275, 50)
 
-        # save dropbox link
+        # save dropbox link            
         self.save_dropbox_link_button = QPushButton("Generate Share Link", self)
         self.save_dropbox_link_button.setFont(self.font_small)
         self.save_dropbox_link_button.setStyleSheet(self.style_sheet)
@@ -162,13 +167,14 @@ class ServerConfig(QMainWindow):
         self.set_api_token_button.released.connect(self.set_dropbox_api_token_clicked)
         if not os.path.exists(os.path.join(self.toplevel_folder, "dropbox.ini")):
             with open(os.path.join(self.toplevel_folder, "dropbox.ini"), "w") as ini:
-                self.dropbox_config["DROPBOX"] = {}
-                self.dropbox_config["DROPBOX"]["TOKEN"] = self.server_textbox.text()
+                self.dropbox_config["DROPBOX"] = {
+                    "TOKEN": self.server_textbox.text(),
+                    "SHARELINK": self.sharefolder_textbox.text()
+                }
                 self.dropbox_config.write(ini)
             self.api_token = self.server_textbox.text()
             self.dropbox_handler = DropboxHandler(self.api_token)
-            self.set_api_token_button.setText("Token is set")
-            self.set_api_token_button.setStyleSheet(self.style_sheet_green)
+            self.server_textbox.setStyleSheet(self.style_sheet_line_green)
 
     def set_dropbox_api_token_clicked(self):
         self.set_api_token_button.setStyleSheet(self.style_sheet)
@@ -177,11 +183,15 @@ class ServerConfig(QMainWindow):
     def dropbox_link_button_pressed(self):
         self.save_dropbox_link_button.setStyleSheet(self.style_sheet_bright)
         self.save_dropbox_link_button.released.connect(self.dropbox_link_button_released)
+        self.sharelink = self.dropbox_handler.get_sharelink(self.sharefolder_textbox.text())
+        with open(os.path.join(self.toplevel_folder, "dropbox.ini"), "w") as ini:
+            self.dropbox_config["DROPBOX"]["SHARELINK"] = self.sharelink.url
+            self.dropbox_config.write(ini)
+        self.sharelink_textbox.setText(self.sharelink.url)
+        self.share_link = self.sharelink.url
 
     def dropbox_link_button_released(self):
         self.save_dropbox_link_button.setStyleSheet(self.style_sheet)
-        self.sharelink = self.dropbox_handler.get_sharelink(self.sharefolder_textbox.text())
-        self.sharelink_textbox.setText(self.sharelink.url)
         self.save_dropbox_link_button.released.disconnect(self.dropbox_link_button_released)
 
     def save_config_clicked(self):
