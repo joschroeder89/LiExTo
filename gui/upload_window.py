@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QMessageBox,
     QApplication,
-    QTreeWidget
+    QProgressBar
 )
 from PyQt5.QtGui import (
     QIcon,
@@ -15,8 +15,13 @@ from PyQt5.QtGui import (
     QPalette,
     QImage
 )
+from PyQt5.QtCore import Qt
+from component.dropbox_handler import DropboxHandler
 from component.file_handler import FileHandler
+import configparser
 import gui.main_window
+import os
+import time
 
 class UploadWindow(QMainWindow):
     def __init__(self, livery_files: list, car_file: str):
@@ -34,9 +39,15 @@ class UploadWindow(QMainWindow):
         self.x_pos = (self.screen.size().width() // 2) - (self.width // 2)
         self.y_pos = (self.screen.size().height() // 2) - (self.height // 2)
 
-        # upload flags
-        self.LIVERY_STATUS_OK = False
-        self.CARS_STATUS_OK = False
+        # folder and config parser
+        self.toplevel_folder = os.getcwd()
+        self.dropbox_config = configparser.ConfigParser()
+        if os.path.exists(os.path.join(self.toplevel_folder, "dropbox.ini")):
+            self.dropbox_config.read(os.path.join(self.toplevel_folder, "dropbox.ini"))
+            self.api_token = self.dropbox_config["DROPBOX"]["TOKEN"]
+            self.share_link = self.dropbox_config["DROPBOX"]["SHARELINK"]
+            if self.api_token:
+                self.dropbox_handler = DropboxHandler(self.api_token)
 
         # image and icon paths
         self.bg_img = QImage("./images/upload.png")
@@ -51,7 +62,7 @@ class UploadWindow(QMainWindow):
 
         # style sheets
         self.style_sheet_banner = "QPushButton{background-color: rgba(197, 25, 102, 0);\
-                                               color: rgb(255, 124, 1);}"
+                                               color: rgb(253, 214, 38);}"
         self.style_sheet = "QPushButton{background-color: rgb(159, 47, 223);\
                                         color: rgb(47, 196, 223);\
                                         border: 2px solid rgb(47, 196, 223);}"
@@ -64,6 +75,12 @@ class UploadWindow(QMainWindow):
         self.style_sheet_bright = "QPushButton{background-color: rgb(177, 105, 219);\
                                                color: rgb(47, 196, 223);\
                                                border: 2px solid rgb(47, 196, 223);}"
+        self.style_sheet_progress_bar = "QProgressBar{background-color: rgb(159, 47, 223);\
+                                                      color: rgb(47, 196, 223);\
+                                                      border: 2px solid rgb(47, 196, 223);}\
+                                        QProgressBar::chunk{background-color: rgb(71, 243, 128);\
+                                                            color: rgb(47, 196, 223);\
+                                                            border: 2px solid rgb(47, 196, 223);}"
 
         # set background image and stylesheet
         self.palette = QPalette()
@@ -87,6 +104,14 @@ class UploadWindow(QMainWindow):
             # name_list = [name.split('/')[-3] for name in self.livery_files]
             # items = [f"{name}/{folder}/{item}" for item, name, folder in zip(item_list, name_list, folder_list)]
             self.list.addItems(self.livery_files)
+
+        # progress bar
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setStyleSheet(self.style_sheet_progress_bar)
+        self.progress_bar.move(178, 600)
+        self.progress_bar.resize(1000, 80)
+        self.progress_bar.setFont(self.font_banner)
+        self.progress_bar.setAlignment(Qt.AlignCenter)
 
         # clear items
         self.clear_items_button = QPushButton("Clear Items", self)
@@ -124,8 +149,8 @@ class UploadWindow(QMainWindow):
 
         # text input for server adress
         self.server_textbox = QLineEdit(self)
-        self.server_textbox.move(425, 480)
-        self.server_textbox.resize(825, 50)
+        self.server_textbox.move(178, 520)
+        self.server_textbox.resize(1000, 50)
         self.server_textbox.setFont(self.font_small)
         self.server_textbox.setStyleSheet(self.style_sheet_line)
         self.server_textbox.setPlaceholderText("Enter Dropbox Share Link here...")
@@ -152,6 +177,9 @@ class UploadWindow(QMainWindow):
         self.server_name_input = self.server_textbox.text()
 
     def upload_check(self):
+        for i in range(101):
+            time.sleep(0.05)
+            self.progress_bar.setValue(i)
         self.upload_button.setStyleSheet(self.style_sheet)
 
     def livery_files_clicked(self):
