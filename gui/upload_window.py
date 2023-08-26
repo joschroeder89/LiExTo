@@ -56,30 +56,31 @@ class UploadWindow(QMainWindow):
 
         # fonts
         self.font_big = QFont("Roboto Mono", 26)
-        self.font_small = QFont("Roboto Mono", 16)
+        self.font_small = QFont("Roboto Mono", 14)
         self.font_tiny = QFont("Roboto Mono", 10)
         self.font_banner = QFont("Roboto Mono", 40)
 
         # style sheets
-        self.style_sheet_banner = "QPushButton{background-color: rgba(197, 25, 102, 0);\
-                                               color: rgb(253, 214, 38);}"
-        self.style_sheet = "QPushButton{background-color: rgb(159, 47, 223);\
-                                        color: rgb(47, 196, 223);\
-                                        border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_list = "QListWidget{background-color: rgb(159, 47, 223);\
-                                             color: rgb(47, 196, 223);\
-                                             border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_line = "QLineEdit{background-color: rgb(159, 47, 223);\
-                                           color: rgb(47, 196, 223);\
-                                           border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_bright = "QPushButton{background-color: rgb(177, 105, 219);\
+        self.style_sheet_banner = "QPushButton{background-color: rgba(159, 47, 223, 0.884);\
                                                color: rgb(47, 196, 223);\
                                                border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_progress_bar = "QProgressBar{background-color: rgb(159, 47, 223);\
-                                                      color: rgb(47, 196, 223);\
+        self.style_sheet = "QPushButton{background-color: rgba(159, 47, 223, 0.884);\
+                                        color: rgb(47, 196, 223);\
+                                        border: 2px solid rgb(47, 196, 223);}"
+        self.style_sheet_list = "QListWidget{background-color: rgba(159, 47, 223, 0.884);\
+                                             color: rgb(47, 196, 223);\
+                                             border: 2px solid rgb(47, 196, 223);}"
+        self.style_sheet_line = "QLineEdit{background-color: rgba(159, 47, 223, 0.884);\
+                                           color: rgb(47, 196, 223);\
+                                           border: 2px solid rgb(47, 196, 223);}"
+        self.style_sheet_bright = "QPushButton{background-color: rgba(177, 105, 219, 0.884);\
+                                               color: rgb(47, 196, 223);\
+                                               border: 2px solid rgb(47, 196, 223);}"
+        self.style_sheet_progress_bar = "QProgressBar{background-color: rgba(159, 47, 223, 0.884);\
+                                                      color: rgb(39, 169, 192);\
                                                       border: 2px solid rgb(47, 196, 223);}\
-                                        QProgressBar::chunk{background-color: rgb(71, 243, 128);\
-                                                            color: rgb(47, 196, 223);\
+                                        QProgressBar::chunk{background-color: rgba(71, 243, 128, 0.884);\
+                                                            color: rgb(39, 169, 192);\
                                                             border: 2px solid rgb(47, 196, 223);}"
 
         # set background image and stylesheet
@@ -93,82 +94,88 @@ class UploadWindow(QMainWindow):
         self.setFixedSize(self.width, self.height)
         self.resize(self.width, self.height)
 
+        # list banner
+        self.banner = QPushButton("Selected Files", self)
+        self.banner.setFont(self.font_small)
+        self.banner.move(178, 180)
+        self.banner.resize(225, 50)
+        self.banner.setStyleSheet(self.style_sheet)
+
         # list widget
         self.list.setStyleSheet(self.style_sheet_list)
         self.list.setFont(self.font_tiny)
-        self.list.resize(825, 250)
-        self.list.move(425, 225)
+        self.list.resize(1000, 250)
+        self.list.move(178, 235)
         if self.livery_files:
-            # item_list = [item.split('/')[-1] for item in self.livery_files]
-            # folder_list = [folder.split('/')[-2] for folder in self.livery_files]
-            # name_list = [name.split('/')[-3] for name in self.livery_files]
-            # items = [f"{name}/{folder}/{item}" for item, name, folder in zip(item_list, name_list, folder_list)]
             self.list.addItems(self.livery_files)
+
+        # banner
+        self.banner = QPushButton("Livery Upload", self)
+        self.banner.setFont(self.font_banner)
+        self.banner.move(400, 75)
+        self.banner.resize(600, 75)
+        self.banner.setStyleSheet(self.style_sheet_banner)
 
         # progress bar
         self.progress_bar = QProgressBar(self)
         self.progress_bar.setStyleSheet(self.style_sheet_progress_bar)
-        self.progress_bar.move(178, 600)
+        self.progress_bar.move(178, 665)
         self.progress_bar.resize(1000, 80)
         self.progress_bar.setFont(self.font_banner)
         self.progress_bar.setAlignment(Qt.AlignCenter)
 
         # clear items
-        self.clear_items_button = QPushButton("Clear Items", self)
+        self.clear_items_button = QPushButton("Clear Files", self)
         self.clear_items_button.setFont(self.font_small)
         self.clear_items_button.setToolTip("Clear all items.")
         self.clear_items_button.setStyleSheet(self.style_sheet)
-        self.clear_items_button.resize(350, 50)
-        self.clear_items_button.move(50, 335)
+        self.clear_items_button.resize(225, 50)
+        self.clear_items_button.move(638, 490)
         self.clear_items_button.pressed.connect(self.clear_files)
 
-        # livery upload button
-        self.banner = QPushButton("Livery Upload", self)
-        self.banner.setFont(self.font_banner)
-        self.banner.move(300, 25)
-        self.banner.resize(800, 200)
-        self.banner.setStyleSheet(self.style_sheet_banner)
-
         # button for choosing livery images
-        self.upload_livery_files = QPushButton("Select Livery Images", self)
+        self.upload_livery_files = QPushButton("Select Livery Files", self)
         self.upload_livery_files.setFont(self.font_small)
         self.upload_livery_files.setToolTip("Upload your livery files.")
         self.upload_livery_files.setStyleSheet(self.style_sheet)
-        self.upload_livery_files.move(50, 225)
-        self.upload_livery_files.resize(350, 50)
+        self.upload_livery_files.move(178, 490)
+        self.upload_livery_files.resize(225, 50)
         self.upload_livery_files.pressed.connect(self.livery_files_clicked)
 
         # button for choosing car.json
-        self.upload_livery_json = QPushButton("Select Car.json File", self)
+        self.upload_livery_json = QPushButton("Select Car File", self)
         self.upload_livery_json.setFont(self.font_small)
         self.upload_livery_json.setToolTip("Upload your livery files.")
         self.upload_livery_json.setStyleSheet(self.style_sheet)
-        self.upload_livery_json.move(50, 280)
-        self.upload_livery_json.resize(350, 50)
+        self.upload_livery_json.move(408, 490)
+        self.upload_livery_json.resize(225, 50)
         self.upload_livery_json.pressed.connect(self.livery_json_clicked)
 
         # text input for server adress
         self.server_textbox = QLineEdit(self)
-        self.server_textbox.move(178, 520)
+        self.server_textbox.move(178, 610)
         self.server_textbox.resize(1000, 50)
         self.server_textbox.setFont(self.font_small)
         self.server_textbox.setStyleSheet(self.style_sheet_line)
-        self.server_textbox.setPlaceholderText("Enter Dropbox Share Link here...")
+        if self.share_link:
+            self.server_textbox.setText(self.share_link)
+        else:
+            self.server_textbox.setPlaceholderText("Enter Dropbox Share Link here...")
 
         # start upload button
         self.upload_button = QPushButton("Upload", self)
         self.upload_button.setFont(self.font_big)
         self.upload_button.setStyleSheet(self.style_sheet)
-        self.upload_button.move(1000, 750)
-        self.upload_button.resize(250, 75)
+        self.upload_button.move(1028, 750)
+        self.upload_button.resize(150, 75)
         self.upload_button.pressed.connect(self.start_upload)
 
         # back button
         self.back_button = QPushButton("Back", self)
         self.back_button.setFont(self.font_big)
         self.back_button.setStyleSheet(self.style_sheet)
-        self.back_button.move(125, 750)
-        self.back_button.resize(250, 75)
+        self.back_button.move(178, 750)
+        self.back_button.resize(150, 75)
         self.back_button.pressed.connect(self.go_back)
 
     def start_upload(self):
@@ -197,18 +204,9 @@ class UploadWindow(QMainWindow):
         if not self.livery_files:
             return
         if self.livery_files:
-            # item_list = [item.split('/')[-1] for item in self.livery_files]
-            # folder_list = [folder.split('/')[-2] for folder in self.livery_files]
-            # name_list = [name.split('/')[-3] for name in self.livery_files]
-            # items = [f"{name}/{folder}/{item}" for item, name, folder in zip(item_list, name_list, folder_list)]
             self.livery_files = list(set(self.livery_files))
             self.list.addItems(self.livery_files)
             self.livery_files = [self.list.item(x).text() for x in range(self.list.count())]
-            # self.livery_files = list(set(self.livery_files))
-            # for item in items:
-            #     if item not in self.livery_files:
-            #         self.livery_files.append(item)
-        # return
 
     def livery_json_clicked(self):
         self.upload_livery_json.setStyleSheet(self.style_sheet_bright)

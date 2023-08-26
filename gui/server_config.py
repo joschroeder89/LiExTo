@@ -46,26 +46,27 @@ class ServerConfig(QMainWindow):
 
         # fonts
         self.font_big = QFont("Roboto Mono", 26)
-        self.font_small = QFont("Roboto Mono", 16)
+        self.font_small = QFont("Roboto Mono", 14)
         self.font_tiny = QFont("Roboto Mono", 10)
         self.font_banner = QFont("Roboto Mono", 40)
 
         # style sheets
-        self.style_sheet_banner = "QPushButton{background-color: rgba(159, 47, 223,0);\
-                                        color: rgb(47, 196, 223);}"
+        self.style_sheet_banner = "QPushButton{background-color: rgba(159, 47, 223, 0.884);\
+                                               color: rgb(47, 196, 223);\
+                                               border: 2px solid rgb(47, 196, 223);}"
         self.style_sheet = "QPushButton{background-color: rgba(159, 47, 223, 0.884);\
                                              color: rgb(47, 196, 223);\
                                              border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_green = "QPushButton{background-color: rgb(37, 199, 137);\
-                                              color: rgb(47, 196, 223);\
+        self.style_sheet_green = "QPushButton{background-color: rgba(71, 243, 128, 0.884);\
+                                              color: rgb(4, 102, 119);\
                                               border: 2px solid rgb(47, 196, 223);}"
         self.style_sheet_line = "QLineEdit{background-color: rgba(159, 47, 223, 0.884);\
                                       color: rgb(47, 196, 223);\
                                       border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_line_green = "QLineEdit{background-color: rgb(0, 255, 98);\
-                                                 color: rgb(159, 47, 223);\
+        self.style_sheet_line_green = "QLineEdit{background-color: rgba(71, 243, 128, 0.884);\
+                                                 color: rgb(4, 102, 119);\
                                                  border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_bright = "QPushButton{background-color: rgb(177, 105, 219);\
+        self.style_sheet_bright = "QPushButton{background-color: rgba(177, 105, 219, 0.884);\
                                                color: rgb(47, 196, 223);\
                                                border: 2px solid rgb(47, 196, 223);}"
 
@@ -89,8 +90,8 @@ class ServerConfig(QMainWindow):
 
         # text input for dropbox link
         self.server_textbox = QLineEdit(self)
-        self.server_textbox.move(50, 225)
-        self.server_textbox.resize(995, 50)
+        self.server_textbox.move(178, 535)
+        self.server_textbox.resize(850, 50)
         self.server_textbox.setFont(self.font_small)
         if self.api_token:
             self.server_textbox.setStyleSheet(self.style_sheet_line_green)
@@ -102,16 +103,16 @@ class ServerConfig(QMainWindow):
 
         # sharefolder init
         self.sharefolder_textbox = QLineEdit(self)
-        self.sharefolder_textbox.move(50, 285)
-        self.sharefolder_textbox.resize(995, 50)
+        self.sharefolder_textbox.move(178, 590)
+        self.sharefolder_textbox.resize(850, 50)
         self.sharefolder_textbox.setFont(self.font_small)
         self.sharefolder_textbox.setStyleSheet(self.style_sheet_line)
         self.sharefolder_textbox.setPlaceholderText("Enter Share Folder Name here...")
 
         # sharelink output box
         self.sharelink_textbox = QLineEdit(self)
-        self.sharelink_textbox.move(50, 345)
-        self.sharelink_textbox.resize(995, 50)
+        self.sharelink_textbox.move(178, 645)
+        self.sharelink_textbox.resize(850, 50)
         self.sharelink_textbox.setFont(self.font_small)
         if not self.share_link:
             self.sharelink_textbox.setPlaceholderText("Dropbox Share Link will appear here...")
@@ -127,31 +128,31 @@ class ServerConfig(QMainWindow):
             self.set_api_token_button.pressed.connect(self.set_dropbox_api_token)
         self.set_api_token_button.setStyleSheet(self.style_sheet)
         self.set_api_token_button.setFont(self.font_small)
-        self.set_api_token_button.move(1050, 225)
-        self.set_api_token_button.resize(275, 50)
+        self.set_api_token_button.move(1035, 535)
+        self.set_api_token_button.resize(250, 50)
 
         # save dropbox link
         self.save_dropbox_link_button = QPushButton("Generate Share Link", self)
         self.save_dropbox_link_button.setFont(self.font_small)
         self.save_dropbox_link_button.setStyleSheet(self.style_sheet)
-        self.save_dropbox_link_button.move(1050, 345)
-        self.save_dropbox_link_button.resize(275, 50)
+        self.save_dropbox_link_button.move(1035, 645)
+        self.save_dropbox_link_button.resize(250, 50)
         self.save_dropbox_link_button.pressed.connect(self.dropbox_link_button_pressed)
 
         # create share folder
         self.create_sharefolder_button = QPushButton("Create Share Folder", self)
         self.create_sharefolder_button.setFont(self.font_small)
         self.create_sharefolder_button.setStyleSheet(self.style_sheet)
-        self.create_sharefolder_button.move(1050, 285)
-        self.create_sharefolder_button.resize(275, 50)
+        self.create_sharefolder_button.move(1035, 590)
+        self.create_sharefolder_button.resize(250, 50)
         self.create_sharefolder_button.pressed.connect(self.create_sharefolder)
 
         # back button
         self.back_button = QPushButton("Back", self)
         self.back_button.setFont(self.font_big)
         self.back_button.setStyleSheet(self.style_sheet)
-        self.back_button.move(150, 750)
-        self.back_button.resize(250, 75)
+        self.back_button.move(178, 750)
+        self.back_button.resize(150, 75)
         self.back_button.pressed.connect(self.go_back)
 
     def set_dropbox_api_token(self):

@@ -52,33 +52,35 @@ class DownloadWindow(QMainWindow):
 
         # fonts
         self.font_big = QFont("Roboto Mono", 26)
-        self.font_small = QFont("Roboto Mono", 16)
+        self.font_small = QFont("Roboto Mono", 14)
+        self.font_warning = QFont("Roboto Mono", 16)
         self.font_tiny = QFont("Roboto Mono", 10)
         self.font_banner = QFont("Roboto Mono", 40)
 
         # style sheets
-        self.style_sheet_banner = "QPushButton{background-color: rgba(197, 25, 102, 0);\
-                                               color: rgb(47, 196, 223);}"
-        self.style_sheet = "QPushButton{background-color: rgb(159, 47, 223);\
+        self.style_sheet_banner = "QPushButton{background-color: rgba(159, 47, 223, 0.884);\
+                                               color: rgb(47, 196, 223);\
+                                               border: 2px solid rgb(47, 196, 223);}"
+        self.style_sheet = "QPushButton{background-color: rgba(159, 47, 223, 0.884);\
                                         color: rgb(47, 196, 223);\
                                         border: 2px solid rgb(47, 196, 223);}"
         self.style_sheet_line = "QLineEdit{background-color: rgba(159, 47, 223, 0.884);\
                                            color: rgb(47, 196, 223);\
                                            border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_warning = "QLineEdit{background-color: rgba(252, 54, 40, 0.884);\
+        self.style_sheet_warning = "QPushButton{background-color: rgba(248, 62, 62, 0.884);\
                                            color: rgb(47, 196, 223);\
                                            border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_green = "QLineEdit{background-color: rgba(8, 190, 63, 1);\
+        self.style_sheet_green = "QPushButton{background-color: rgba(71, 243, 128, 0.884);\
                                            color: rgb(4, 102, 119);\
                                            border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_bright = "QPushButton{background-color: rgb(177, 105, 219);\
+        self.style_sheet_bright = "QPushButton{background-color: rgba(177, 105, 219, 0.884);\
                                                color: rgb(47, 196, 223);\
                                                border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_progress_bar = "QProgressBar{background-color: rgb(159, 47, 223);\
-                                               color: rgb(47, 196, 223);\
+        self.style_sheet_progress_bar = "QProgressBar{background-color: rgba(159, 47, 223, 0.884);\
+                                               color: rgb(39, 169, 192);\
                                                border: 2px solid rgb(47, 196, 223);}\
-                                               QProgressBar::chunk{background-color: rgb(71, 243, 128);\
-                                               color: rgb(47, 196, 223);\
+                                               QProgressBar::chunk{background-color: rgba(71, 243, 128, 0.884);\
+                                               color: rgb(39, 169, 192);\
                                                border: 2px solid rgb(47, 196, 223);}"
 
         # set background image and stylesheet
@@ -102,26 +104,25 @@ class DownloadWindow(QMainWindow):
         # progress bar
         self.progress_bar = QProgressBar(self)
         self.progress_bar.setStyleSheet(self.style_sheet_progress_bar)
-        self.progress_bar.move(178, 600)
+        self.progress_bar.move(178, 665)
         self.progress_bar.resize(1000, 80)
         self.progress_bar.setFont(self.font_banner)
         self.progress_bar.setAlignment(Qt.AlignCenter)
 
         # uptodate textbox
-        self.uptodate_textbox = QLineEdit(self)
-        self.uptodate_textbox.move(178, 445)
+        self.uptodate_textbox = QPushButton(self)
+        self.uptodate_textbox.move(178, 200)
         self.uptodate_textbox.resize(1000, 50)
-        self.uptodate_textbox.setFont(self.font_small)
+        self.uptodate_textbox.setFont(self.font_warning)
+
         if not self.uptodate_status:
-            self.uptodate_textbox.setText("A newer version of the livery pack is available, please update...")
-            self.uptodate_textbox.setStyleSheet(self.style_sheet_warning)
+            self.set_status_outdated()
         else:
-            self.uptodate_textbox.setText("Livery pack is up-to-date...")
-            self.uptodate_textbox.setStyleSheet(self.style_sheet_green)
+            self.set_status_uptodate()
 
         # sharelink output box
         self.sharelink_textbox = QLineEdit(self)
-        self.sharelink_textbox.move(178, 520)
+        self.sharelink_textbox.move(178, 610)
         self.sharelink_textbox.resize(1000, 50)
         self.sharelink_textbox.setFont(self.font_small)
         if not self.share_link:
@@ -134,22 +135,17 @@ class DownloadWindow(QMainWindow):
         self.download_button = QPushButton("Download", self)
         self.download_button.setFont(self.font_big)
         self.download_button.setStyleSheet(self.style_sheet)
-        self.download_button.move(900, 750)
-        self.download_button.resize(300, 75)
+        self.download_button.move(950, 750)
+        self.download_button.resize(230, 75)
         self.download_button.pressed.connect(self.download_clicked)
 
         # back button
         self.back_button = QPushButton("Back", self)
         self.back_button.setFont(self.font_big)
         self.back_button.setStyleSheet(self.style_sheet)
-        self.back_button.move(150, 750)
-        self.back_button.resize(250, 75)
+        self.back_button.move(178, 750)
+        self.back_button.resize(150, 75)
         self.back_button.pressed.connect(self.go_back)
-
-    def update_livery_files(self, livery_files):
-        if livery_files:
-            self.livery_files = livery_files
-        return self.livery_files
 
     def download_clicked(self):
         self.download_button.setStyleSheet(self.style_sheet_bright)
@@ -159,7 +155,18 @@ class DownloadWindow(QMainWindow):
         for i in range(101):
             time.sleep(0.05)
             self.progress_bar.setValue(i)
+        self.set_status_uptodate()
         self.download_button.setStyleSheet(self.style_sheet)
+
+    def set_status_uptodate(self):
+        self.uptodate_status = True
+        self.uptodate_textbox.setText("Livery pack is up-to-date...")
+        self.uptodate_textbox.setStyleSheet(self.style_sheet_green)
+
+    def set_status_outdated(self):
+        self.uptodate_status = False
+        self.uptodate_textbox.setText("A newer version of the livery pack might be available, please update...")
+        self.uptodate_textbox.setStyleSheet(self.style_sheet_warning)
 
     def go_back(self):
         self.back_button.setStyleSheet(self.style_sheet_bright)

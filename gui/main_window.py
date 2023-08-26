@@ -38,17 +38,18 @@ class MainWindow(QMainWindow):
 
         # fonts
         self.font_big = QFont("Roboto Mono", 26)
-        self.font_small = QFont("Roboto Mono", 16)
+        self.font_small = QFont("Roboto Mono", 14)
         self.font_tiny = QFont("Roboto Mono", 10)
         self.font_banner = QFont("Roboto Mono", 40)
 
         # style sheets
-        self.style_sheet_banner = "QPushButton{background-color: rgba(197, 25, 102, 0);\
-                                               color: rgb(47, 196, 223);}"
-        self.style_sheet = "QPushButton{background-color: rgb(197, 25, 102);\
+        self.style_sheet_banner = "QPushButton{background-color: rgba(197, 25, 102, 0.884);\
+                                               color: rgb(47, 196, 223);\
+                                               border: 2px solid rgb(47, 196, 223);}"
+        self.style_sheet = "QPushButton{background-color: rgba(197, 25, 102, 0.884);\
                                         color: rgb(47, 196, 223);\
                                         border: 2px solid rgb(47, 196, 223);}"
-        self.style_sheet_bright = "QPushButton{background-color: rgb(218, 65, 133);\
+        self.style_sheet_bright = "QPushButton{background-color: rgba(218, 65, 133, 0.884);\
                                                color: rgb(47, 196, 223);\
                                                border: 2px solid rgb(47, 196, 223);}"
 
@@ -65,8 +66,8 @@ class MainWindow(QMainWindow):
         # banner
         self.banner = QPushButton("Livery Exchange Tool", self)
         self.banner.setFont(self.font_banner)
-        self.banner.move(300, 25)
-        self.banner.resize(800, 200)
+        self.banner.move(315, 75)
+        self.banner.resize(700, 75)
         self.banner.setStyleSheet(self.style_sheet_banner)
 
         # upload button
@@ -74,7 +75,7 @@ class MainWindow(QMainWindow):
         self.upload_button.setFont(self.font_big)
         self.upload_button.setToolTip("Upload your livery files.")
         self.upload_button.setStyleSheet(self.style_sheet)
-        self.upload_button.move(200, 750)
+        self.upload_button.move(160, 750)
         self.upload_button.resize(250, 75)
         self.upload_button.pressed.connect(self.upload_clicked)
 
@@ -83,8 +84,8 @@ class MainWindow(QMainWindow):
         self.download_button.setFont(self.font_big)
         self.download_button.setToolTip("Download a livery pack.")
         self.download_button.setStyleSheet(self.style_sheet)
-        self.download_button.move(550, 750)
-        self.download_button.resize(300, 75)
+        self.download_button.move(420, 750)
+        self.download_button.resize(250, 75)
         self.download_button.pressed.connect(self.download_clicked)
 
         # config button
@@ -92,9 +93,18 @@ class MainWindow(QMainWindow):
         self.server_button.setFont(self.font_big)
         self.server_button.setToolTip("Configure Exchange Server.")
         self.server_button.setStyleSheet(self.style_sheet)
-        self.server_button.move(950, 750)
+        self.server_button.move(680, 750)
         self.server_button.resize(250, 75)
         self.server_button.pressed.connect(self.server_conf)
+
+        # exit button
+        self.exit_button = QPushButton("Exit", self)
+        self.exit_button.setFont(self.font_big)
+        self.exit_button.setToolTip("Exit Application")
+        self.exit_button.setStyleSheet(self.style_sheet)
+        self.exit_button.move(940, 750)
+        self.exit_button.resize(250, 75)
+        self.exit_button.pressed.connect(self.exit_clicked)
 
     def update_livery_files(self, livery_files):
         if livery_files:
@@ -132,4 +142,13 @@ class MainWindow(QMainWindow):
         self.upload_button.released.disconnect(self.upload_button_color_reset)
         self.upload = gui.upload_window.UploadWindow(self.livery_files, self.car_file)
         self.upload.show()
+        self.close()
+
+    def exit_clicked(self):
+        self.exit_button.setStyleSheet(self.style_sheet_bright)
+        self.exit_button.released.connect(self.exit_released)
+
+    def exit_released(self):
+        self.exit_button.setStyleSheet(self.style_sheet)
+        self.exit_button.released.disconnect(self.exit_released)
         self.close()
