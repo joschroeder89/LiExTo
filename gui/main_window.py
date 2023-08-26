@@ -75,7 +75,7 @@ class MainWindow(QMainWindow):
         self.upload_button.setFont(self.font_big)
         self.upload_button.setToolTip("Upload your livery files.")
         self.upload_button.setStyleSheet(self.style_sheet)
-        self.upload_button.move(160, 750)
+        self.upload_button.move(165, 750)
         self.upload_button.resize(250, 75)
         self.upload_button.pressed.connect(self.upload_clicked)
 
@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
         self.server_button.setFont(self.font_big)
         self.server_button.setToolTip("Configure Exchange Server.")
         self.server_button.setStyleSheet(self.style_sheet)
-        self.server_button.move(680, 750)
+        self.server_button.move(675, 750)
         self.server_button.resize(250, 75)
         self.server_button.pressed.connect(self.server_conf)
 
@@ -102,7 +102,7 @@ class MainWindow(QMainWindow):
         self.exit_button.setFont(self.font_big)
         self.exit_button.setToolTip("Exit Application")
         self.exit_button.setStyleSheet(self.style_sheet)
-        self.exit_button.move(940, 750)
+        self.exit_button.move(930, 750)
         self.exit_button.resize(250, 75)
         self.exit_button.pressed.connect(self.exit_clicked)
 
